@@ -5,7 +5,8 @@ import * as S from "./MangoLogger.style";
 const MangoLogger = () => {
   return (
     <S.Main>
-      <h1>Record mangos</h1>
+      <h1>Mango Metrics</h1>
+      <h2>Rate | Submit | Share</h2>
       <Form/>
     </S.Main>
   );

@@ -1,8 +1,13 @@
 import React, { Fragment, useState, useEffect } from "react";
 import ratioIsValid from "../../utils/regex.js";
 import Ratings from "../Ratings/Ratings.js";
+import * as S from "./Form.style";
 
 const Form = () => {
+  const [date, setDate] = useState("");
+  const [source, setSource] = useState("");
+  const [size, setSize] = useState("medium");
+  const [mainColour, setMainColour] = useState("yellow");
   const [ratio, setRatio] = useState("");
   const [ratioMsg, setRatioMsg] = useState(true);
 
@@ -14,12 +19,17 @@ const Form = () => {
   const [overall, setOverall] = useState(5.0);
 
   useEffect(() => {
-    console.log("Mouthwateringness: ", mouthwateringness);
-    console.log("Aroma: ", aroma);
-    console.log("Nummyness: ", nummyness);
-    console.log("Gloriousness: ", gloriousness);
-    console.log("Overall: ", overall);
-    setOverall((parseInt(mouthwateringness) + parseInt(aroma) + parseInt(nummyness) + parseInt(gloriousness))/4)
+    console.log("New source: ", source)
+  }, [source])
+
+  useEffect(() => {
+    setOverall(
+      (parseInt(mouthwateringness) +
+        parseInt(aroma) +
+        parseInt(nummyness) +
+        parseInt(gloriousness)) /
+        4
+    );
   }, [mouthwateringness, aroma, nummyness, gloriousness]);
 
   const ratingsValues = {
@@ -28,78 +38,120 @@ const Form = () => {
       setValue: setMouthwateringness
     },
     aroma: {
-        getValue: aroma,
-        setValue: setAroma
+      getValue: aroma,
+      setValue: setAroma
+    },
+    nummyness: {
+      getValue: nummyness,
+      setValue: setNummyness
+    },
+    gloriousness: {
+      getValue: gloriousness,
+      setValue: setgloriousness
+    },
+    overall: {
+      getValue: overall,
+      setValue: setOverall
+    }
+  };
+
+  const handleSubmit = event => {
+    const payload = {
+      name: "Steve Nash",
+      task: "assist",
+      time_of_purchase: "Fri 6 Sep",
+      time_of_consumption: date,
+      mango_rating: {
+        mouthwateringness: mouthwateringness,
+        aroma: aroma,
+        nummyness: nummyness,
+        gloriousness: gloriousness,
+        overall: overall
       },
-      nummyness: {
-        getValue: nummyness,
-        setValue: setNummyness
+      metadata: {
+        source: "A cool little shop!",
+        size: "large",
+        main_colour: "orange",
+        flesh_to_stone_ratio: "2:1"
       },
-      gloriousness: {
-        getValue: gloriousness,
-        setValue: setgloriousness
+      comment: "An all-around stellar mango."
+    }
+    fetch("https://mango-metrics-api.azurewebsites.net/api/postMangos", {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/plain, */*',
       },
-      overall: {
-        getValue: overall,
-        setValue: setOverall
-      }
+      redirect: 'follow',
+      referrer: 'no-referrer', 
+      body: JSON.stringify(payload)
+    })
+    .then(data => data.json()
+    .then(response => console.log("The Azure API POST response message: ", response.body)))
+
+    // fetch("https://mango-metrics-api.azurewebsites.net/api/mangos")
+    // .then(response => console.log("Here is database", response))
+
+    event.preventDefault();
   };
 
   return (
     <Fragment>
-      <label htmlFor="timeOfPurchase">
-        Time of purchase:
-        <input
-          type="datetime-local"
-          name="timeOfPurchase"
-          id="timeOfPurchase"
+      <form onSubmit={e => handleSubmit(e)}>
+      <S.Label htmlFor="dateEaten">
+        Date eaten:
+      </S.Label>
+      <input
+          type="date"
+          name="dateEaten"
+          id="dateEaten"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          required
         />
-      </label>
-      <label htmlFor="timeOftimeOfConsumption">
-        Time of consumption:
-        <input
-          type="datetime-local"
-          name="timeOfConsumption"
-          id="timeOfConsumption"
-        />
-      </label>
-      <label htmlFor="source">
+      <S.Label htmlFor="source">
         Source:
-        <input type="text" name="source" id="source" />
-      </label>
-      <label htmlFor="size">
+      </S.Label>
+      <input type="text" name="source" id="source" value={source} onChange={e => setSource(e.target.value)} required />
+      <S.Label htmlFor="size">
         Size:
-        <select name="size" id="size">
+      </S.Label>
+      <select name="size" id="size" value={size} onChange={e => setSize(e.target.value)}>
           <option value="small">Small</option>
           <option value="medium" selected>
             Medium
           </option>
           <option value="large">Large</option>
         </select>
-      </label>
-      <label htmlFor="colour">
+      <S.Label htmlFor="colour">
         Main colour:
-        <select name="colour" id="colour">
+      </S.Label>
+      <select name="colour" id="colour" value={mainColour} onChange={e => setMainColour(e.target.value)}>
           <option value="green">Green</option>
           <option value="yellow" selected>
             Yellow
           </option>
           <option value="orange">Orange</option>
         </select>
-      </label>
-      <label htmlFor="fleshRatio">
+      <S.Label htmlFor="fleshRatio">
         Flesh to stone ratio:
-        <input
+      </S.Label>
+      <input
           type="text"
           name="fleshRatio"
           id="fleshRatio"
           value={ratio}
           onChange={e => setRatio(e.target.value)}
           onBlur={() => setRatioMsg(ratioIsValid(ratio))}
+          required
         />
-      </label>
       <p>{ratioMsg ? "" : "Please enter a valid ratio"}</p>
-      <Ratings ratings={ratingsValues}/>
+      <Ratings ratings={ratingsValues} />
+      <button>Submit</button>
+      </form>
     </Fragment>
   );
 };
