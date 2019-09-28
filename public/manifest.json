@@ -8,17 +8,27 @@
       "type": "image/x-icon"
     },
     {
-      "src": "mango-192x192px",
+      "src": "mango-152x152px.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "mango-192x192px.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "mango-512x512px",
+      "src": "mango-256x256px.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "mango-512x512px.png",
       "type": "image/png",
       "sizes": "512x512"
     }	    
   ],
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
